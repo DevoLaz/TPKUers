@@ -17,59 +17,96 @@ class LaporanController extends Controller
 
     // ========== TAMPIL VIEW ==========
 
-    public function laba_rugi(Request $request)
-    {
-        $tahun = $request->input('tahun');
-        $bulan = $request->input('bulan');
-        $tanggal = $request->input('tanggal');
+   public function laba_rugi(Request $request)
+{
+    // Ambil input filter
+    $tahun = $request->input('tahun');
+    $bulan = $request->input('bulan');
+    $tanggal = $request->input('tanggal');
 
-        // Siapkan builder dasar
-        $queryPendapatan = DB::table('transaksis')->where('jenis', 'masuk');
-        $queryPengeluaran = DB::table('transaksis')->where('jenis', 'keluar');
+    // Query dasar
+    $queryPendapatan = DB::table('transaksis')->where('jenis', 'masuk');
+    $queryPengeluaran = DB::table('transaksis')->where('jenis', 'keluar');
 
-        // Filter berdasarkan input
-        if ($tahun) {
-            $queryPendapatan->whereYear('tanggal', $tahun);
-            $queryPengeluaran->whereYear('tanggal', $tahun);
-        }
-
-        if ($bulan) {
-            $queryPendapatan->whereMonth('tanggal', $bulan);
-            $queryPengeluaran->whereMonth('tanggal', $bulan);
-        }
-
-        if ($tanggal) {
-            $queryPendapatan->whereDay('tanggal', $tanggal);
-            $queryPengeluaran->whereDay('tanggal', $tanggal);
-        }
-
-        $pendapatan = $queryPendapatan->get();
-        $pengeluaran = $queryPengeluaran->get();
-
-        $totalPendapatan = $pendapatan->sum('jumlah');
-        $totalPengeluaran = $pengeluaran->sum('jumlah');
-
-        // Data untuk dropdown
-        $daftarTahun = DB::table('transaksis')
-            ->selectRaw('YEAR(tanggal) as tahun')
-            ->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
-
-        $daftarBulan = $tahun ? range(1, 12) : [];
-        $daftarTanggal = ($tahun && $bulan) ? range(1, 31) : [];
-
-        return view('laporan_riwayat.labarugi', compact(
-            'pendapatan',
-            'pengeluaran',
-            'totalPendapatan',
-            'totalPengeluaran',
-            'tahun',
-            'bulan',
-            'tanggal',
-            'daftarTahun',
-            'daftarBulan',
-            'daftarTanggal'
-        ));
+    // Apply filters
+    if ($tahun) {
+        $queryPendapatan->whereYear('tanggal', $tahun);
+        $queryPengeluaran->whereYear('tanggal', $tahun);
     }
+
+    if ($bulan) {
+        $queryPendapatan->whereMonth('tanggal', $bulan);
+        $queryPengeluaran->whereMonth('tanggal', $bulan);
+    }
+
+    if ($tanggal) {
+        $queryPendapatan->whereDay('tanggal', $tanggal);
+        $queryPengeluaran->whereDay('tanggal', $tanggal);
+    }
+
+    // Get data
+    $pendapatan = $queryPendapatan->orderBy('tanggal', 'desc')->get();
+    $pengeluaran = $queryPengeluaran->orderBy('tanggal', 'desc')->get();
+
+    // Calculate totals
+    $totalPendapatan = $pendapatan->sum('jumlah');
+    $totalPengeluaran = $pengeluaran->sum('jumlah');
+
+    // Data untuk dropdown tahun
+    $daftarTahun = DB::table('transaksis')
+        ->selectRaw('YEAR(tanggal) as tahun')
+        ->distinct()
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun');
+
+    // Data untuk dropdown bulan
+    $daftarBulan = [];
+    if ($tahun) {
+        // Ambil bulan yang ada transaksi di tahun yang dipilih
+        $bulanTersedia = DB::table('transaksis')
+            ->whereYear('tanggal', $tahun)
+            ->selectRaw('DISTINCT MONTH(tanggal) as bulan')
+            ->orderBy('bulan')
+            ->pluck('bulan')
+            ->toArray();
+        
+        // Kalau ada data, pakai bulan yang ada. Kalau tidak, tampilkan semua bulan
+        $daftarBulan = !empty($bulanTersedia) ? $bulanTersedia : range(1, 12);
+    } else {
+        // Kalau tahun belum dipilih, kosongkan atau bisa isi semua bulan
+        $daftarBulan = range(1, 12);
+    }
+
+    // Data untuk dropdown tanggal
+    $daftarTanggal = [];
+    if ($tahun && $bulan) {
+        // Generate tanggal berdasarkan bulan dan tahun
+        $jumlahHari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+        $daftarTanggal = range(1, $jumlahHari);
+    }
+
+    // Nama bulan untuk display
+    $namaBulan = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
+        4 => 'April', 5 => 'Mei', 6 => 'Juni',
+        7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+        10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+    ];
+
+    return view('laporan_riwayat.labarugi', compact(
+        'pendapatan',
+        'pengeluaran',
+        'totalPendapatan',
+        'totalPengeluaran',
+        'tahun',
+        'bulan',
+        'tanggal',
+        'daftarTahun',
+        'daftarBulan',
+        'daftarTanggal',
+        'namaBulan'
+    ));
+}
 
     public function neraca(Request $request)
 {
@@ -139,11 +176,115 @@ class LaporanController extends Controller
     return view('laporan_riwayat.neraca', compact('data', 'tanggal'));
 }
 
-    public function arus_kas()
-    {
-        $data = [];
-        return view('laporan_riwayat.aruskas', compact('data'));
+    public function arus_kas(Request $request)
+{
+    $tahun = $request->input('tahun', now()->year);
+    $bulan = $request->input('bulan');
+    
+    // Base query
+    $query = DB::table('transaksis');
+    
+    // Apply filters
+    if ($tahun) {
+        $query->whereYear('tanggal', $tahun);
     }
+    if ($bulan) {
+        $query->whereMonth('tanggal', $bulan);
+    }
+    
+    // Clone query for different categories
+    $baseQuery = clone $query;
+    
+    // Calculate saldo awal (transaksi sebelum periode)
+    $saldoAwalQuery = DB::table('transaksis');
+    if ($tahun) {
+        $saldoAwalQuery->where(function($q) use ($tahun, $bulan) {
+            if ($bulan) {
+                // Saldo awal = transaksi sebelum bulan ini di tahun yang sama
+                $q->whereYear('tanggal', $tahun)
+                  ->whereMonth('tanggal', '<', $bulan);
+                // Plus semua transaksi tahun sebelumnya
+                $q->orWhereYear('tanggal', '<', $tahun);
+            } else {
+                // Kalau filter tahun aja, saldo awal = transaksi tahun sebelumnya
+                $q->whereYear('tanggal', '<', $tahun);
+            }
+        });
+    }
+    
+    $saldoAwalMasuk = $saldoAwalQuery->where('jenis', 'masuk')->sum('jumlah');
+    $saldoAwalKeluar = DB::table('transaksis')
+        ->where(function($q) use ($tahun, $bulan) {
+            if ($tahun && $bulan) {
+                $q->whereYear('tanggal', $tahun)
+                  ->whereMonth('tanggal', '<', $bulan);
+                $q->orWhereYear('tanggal', '<', $tahun);
+            } elseif ($tahun) {
+                $q->whereYear('tanggal', '<', $tahun);
+            }
+        })
+        ->where('jenis', 'keluar')
+        ->sum('jumlah');
+    
+    $saldoAwal = $saldoAwalMasuk - $saldoAwalKeluar;
+    
+    // Aktivitas Operasional
+    $operasionalMasuk = (clone $baseQuery)
+        ->where('jenis', 'masuk')
+        ->whereIn('kategori', ['penjualan', 'operasional', 'lain-lain'])
+        ->orderBy('tanggal', 'desc')
+        ->get();
+    
+    $operasionalKeluar = (clone $baseQuery)
+        ->where('jenis', 'keluar')
+        ->whereIn('kategori', ['pembelian', 'operasional', 'gaji', 'listrik', 'sewa'])
+        ->orderBy('tanggal', 'desc')
+        ->get();
+    
+    // Aktivitas Investasi (pembelian/penjualan aset)
+    $investasi = (clone $baseQuery)
+        ->whereIn('kategori', ['pembelian_aset', 'penjualan_aset'])
+        ->orderBy('tanggal', 'desc')
+        ->get();
+    
+    // Aktivitas Pendanaan (modal, pinjaman, dll)
+    $pendanaan = (clone $baseQuery)
+        ->whereIn('kategori', ['modal', 'pinjaman', 'pembayaran_pinjaman'])
+        ->orderBy('tanggal', 'desc')
+        ->get();
+    
+    // Calculate totals
+    $totalKasMasuk = (clone $baseQuery)->where('jenis', 'masuk')->sum('jumlah');
+    $totalKasKeluar = (clone $baseQuery)->where('jenis', 'keluar')->sum('jumlah');
+    $saldoAkhir = $saldoAwal + $totalKasMasuk - $totalKasKeluar;
+    
+    // Count transactions
+    $jumlahTransaksiMasuk = (clone $baseQuery)->where('jenis', 'masuk')->count();
+    $jumlahTransaksiKeluar = (clone $baseQuery)->where('jenis', 'keluar')->count();
+    
+    // Get years for filter
+    $daftarTahun = DB::table('transaksis')
+        ->selectRaw('YEAR(tanggal) as tahun')
+        ->distinct()
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun');
+    
+    return view('laporan_riwayat.aruskas', compact(
+        'operasionalMasuk',
+        'operasionalKeluar',
+        'investasi',
+        'pendanaan',
+        'saldoAwal',
+        'saldoAkhir',
+        'totalKasMasuk',
+        'totalKasKeluar',
+        'jumlahTransaksiMasuk',
+        'jumlahTransaksiKeluar',
+        'tahun',
+        'bulan',
+        'daftarTahun'
+    ));
+}
 
     public function pengadaan(Request $request)
 {
