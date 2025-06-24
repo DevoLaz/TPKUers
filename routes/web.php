@@ -8,6 +8,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\PengadaanController;
+use App\Http\Controllers\AsetTetapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ use App\Http\Controllers\PengadaanController;
 // ===================================================================
 // RUTE UTAMA & DASHBOARD
 // ===================================================================
+Route::resource('aset-tetap', AsetTetapController::class)->middleware('auth');
 
 Route::get('/', function () {
     return redirect()->route('dashboard');

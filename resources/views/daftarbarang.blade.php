@@ -7,22 +7,37 @@
     
     <main class="flex-1 p-8 overflow-y-auto transition-all duration-300 ml-20 group-hover/sidebar:ml-64">
         
-        <!-- Header -->
         <div class="bg-gradient-to-r from-[#173720] to-[#2a5a37] rounded-lg p-6 mb-6 shadow-lg">
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-white mb-2">Daftar Barang</h1>
                     <p class="text-green-100">Kelola dan pantau semua barang dalam inventori</p>
                 </div>
-                <a href="{{ route('pengadaan.create') }}" 
-                   class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all transform hover:scale-105 backdrop-blur font-semibold flex items-center gap-2">
-                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                    <span>Tambah Pengadaan</span>
-                </a>
+                {{-- Area Tombol di Header --}}
+                <div class="flex items-center gap-3">
+                    {{-- TOMBOL TAMBAH BARANG BARU (DIPINDAH KE SINI) --}}
+                    <a href="{{ route('barang.create') }}" 
+                       class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all transform hover:scale-105 backdrop-blur font-semibold flex items-center gap-2">
+                        <i data-lucide="package-plus" class="w-5 h-5"></i>
+                        <span>Tambah Barang</span>
+                    </a>
+                    
+                    {{-- TOMBOL TAMBAH PENGADAAN (STOK) --}}
+                    <a href="{{ route('pengadaan.create') }}" 
+                       class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all transform hover:scale-105 backdrop-blur font-semibold flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        <span>Tambah Pengadaan</span>
+                    </a>
+
+                     <a href="{{ route('pengadaan.riwayat') }}" 
+                       class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all transform hover:scale-105 backdrop-blur font-semibold flex items-center gap-2">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                <span>Riwayat Pengadaan</span>
+            </a>
+                </div>
             </div>
         </div>
 
-        <!-- Filter Section -->
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <form method="GET" action="{{ route('pengadaan.index') }}" class="flex gap-4 items-end">
                 <div class="flex-1">
@@ -60,7 +75,6 @@
             </form>
         </div>
 
-        <!-- Table Section -->
         <div class="bg-white rounded-lg shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -130,7 +144,6 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
             @if($barangs->hasPages())
                 <div class="p-6 border-t border-gray-200">
                     {{ $barangs->appends(request()->query())->links() }}
@@ -138,20 +151,14 @@
             @endif
         </div>
 
-        <!-- Quick Actions -->
-        <div class="mt-6 flex gap-4">
+        <!-- <div class="mt-6 flex gap-4">
+            {{-- TOMBOL TAMBAH BARANG DIHAPUS DARI SINI --}}
             <a href="{{ route('pengadaan.riwayat') }}" 
                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
                 <i data-lucide="history" class="w-5 h-5"></i>
                 <span>Riwayat Pengadaan</span>
             </a>
-            
-            <a href="{{ route('barang.index') }}" 
-               class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center gap-2">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span>Kelola Barang</span>
-            </a>
-        </div>
+        </div> -->
     </main>
 </div>
 @endsection

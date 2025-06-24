@@ -33,7 +33,7 @@
                 <span class="text-xs font-bold text-gray-400 hidden group-hover/sidebar:inline-block">MANAJEMEN DATA</span>
             </div>
 
-            {{-- 🔥 MENU BARU UNTUK PENGADAAN BAHAN BAKU --}}
+            {{-- MENU PENGADAAN BAHAN BAKU --}}
             <a href="{{ route('pengadaan.index') }}" 
                class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('pengadaan.*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="shopping-basket" class="w-5 h-5 shrink-0"></i>
@@ -45,12 +45,15 @@
                 <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Kelola Karyawan</span>
             </a>
-
-            <!-- <a href="{{ route('transaksi.index') }}"
-               class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('transaksi.*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
-                <i data-lucide="shopping-cart" class="w-5 h-5 shrink-0"></i>
-                <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Input Transaksi</span>
-            </a> -->
+            
+            <!-- ============================================= -->
+            <!-- === MENU BARU UNTUK ASET TETAP DITAMBAHKAN DI SINI === -->
+            <!-- ============================================= -->
+            <a href="{{ route('aset-tetap.index') }}" 
+               class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('aset-tetap.*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
+                <i data-lucide="building" class="w-5 h-5 shrink-0"></i>
+                <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Kelola Aset Tetap</span>
+            </a>
 
             <!-- Judul Grup Laporan -->
             <div class="px-2 pt-4 pb-1">
@@ -87,7 +90,7 @@
                 <i data-lucide="landmark" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Perpajakan</span>
             </a>
-             
+                 
             <div class="px-2 pt-4 pb-1">
                 <span class="text-xs font-bold text-gray-400 hidden group-hover/sidebar:inline-block">ANALISIS & DETAIL</span>
             </div>

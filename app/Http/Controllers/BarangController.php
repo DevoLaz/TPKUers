@@ -33,7 +33,7 @@ class BarangController extends Controller
         // Ambil daftar kategori untuk dropdown
         $kategoriList = Barang::distinct()->pluck('kategori')->filter();
 
-        return view('pengadaan', compact('barangs', 'kategoriList'));
+        return view('daftarbarang', compact('barangs', 'kategoriList'));
     }
 
     /**
