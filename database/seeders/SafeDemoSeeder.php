@@ -5,242 +5,80 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Barang;
 use App\Models\Transaction;
+use App\Models\Karyawan;
+use App\Models\Gaji;
+use App\Models\UtangPiutang;
+use App\Models\Pajak;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class SafeDemoSeeder extends Seeder
 {
     public function run()
     {
-        // Clear data safely
-        Transaction::query()->delete();
-        Barang::query()->delete();
+        $this->command->info("\n================================================");
+        $this->command->info("🎯 Memulai Proses Seeding Data Demo...");
+        $this->command->info("================================================\n");
+
+        // Nonaktifkan foreign key checks untuk truncate
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        // Kosongkan semua tabel terkait
+        Transaction::truncate();
+        Barang::truncate();
+        Karyawan::truncate();
+        Gaji::truncate();
+        UtangPiutang::truncate();
+        Pajak::truncate();
         
-        echo "\n🎯 Creating Safe Demo Data...\n\n";
+        $this->command->warn("🗑️  Semua data lama berhasil dihapus.");
+
+        // Aktifkan kembali foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // --- PEMBUATAN DATA MASTER ---
         
-        // Create products
-        $laptop = Barang::create([
-            'nama' => 'Laptop ASUS VivoBook',
-            'kategori' => 'Elektronik', 
-            'harga' => 7500000,
-            'stok' => 10
-        ]);
+        // 1. Buat Data Karyawan
+        $karyawan1 = Karyawan::create(['nama_lengkap' => 'Adam Sholihuddin', 'jabatan' => 'CEO / Founder', 'status_karyawan' => 'tetap', 'tanggal_bergabung' => '2024-01-01', 'gaji_pokok_default' => 15000000]);
+        $karyawan2 = Karyawan::create(['nama_lengkap' => 'Budi Santoso', 'jabatan' => 'Manajer Marketing', 'status_karyawan' => 'tetap', 'tanggal_bergabung' => '2024-02-15', 'gaji_pokok_default' => 9000000]);
+        $karyawan3 = Karyawan::create(['nama_lengkap' => 'Citra Lestari', 'jabatan' => 'Staf Akuntansi', 'status_karyawan' => 'kontrak', 'tanggal_bergabung' => '2025-03-01', 'gaji_pokok_default' => 5500000]);
+        $this->command->info("👥  Created 3 Karyawan.");
+
+        // 2. Buat Data Barang
+        $laptop = Barang::create(['nama' => 'Laptop ASUS VivoBook Pro', 'kategori' => 'Elektronik', 'harga' => 12500000, 'stok' => 15]);
+        $printer = Barang::create(['nama' => 'Printer Epson L3210', 'kategori' => 'Elektronik', 'harga' => 2300000, 'stok' => 8]); // Stok sengaja sedikit
+        $kertas = Barang::create(['nama' => 'Kertas HVS A4 75gr', 'kategori' => 'ATK', 'harga' => 48000, 'stok' => 100]);
+        $this->command->info("📦  Created 3 Barang.");
+
+        // --- PEMBUATAN DATA TRANSAKSIONAL ---
+
+        // 3. Buat Data Utang & Piutang
+        UtangPiutang::create(['tipe' => 'piutang', 'nama_kontak' => 'PT. Jaya Abadi', 'akun' => 'Piutang Usaha', 'jumlah' => 25000000, 'no_invoice' => 'INV/2025/05/001', 'tanggal' => '2025-05-20', 'jatuh_tempo' => '2025-06-20', 'status' => 'belum_lunas', 'keterangan' => 'Penjualan 2 unit laptop']);
+        UtangPiutang::create(['tipe' => 'piutang', 'nama_kontak' => 'CV. Sinar Terang', 'akun' => 'Piutang Usaha', 'jumlah' => 2300000, 'no_invoice' => 'INV/2025/04/015', 'tanggal' => '2025-04-15', 'jatuh_tempo' => '2025-05-15', 'status' => 'lunas']);
+        UtangPiutang::create(['tipe' => 'utang', 'nama_kontak' => 'Supplier ATK', 'akun' => 'Utang Usaha', 'jumlah' => 5000000, 'no_invoice' => 'SUP/ATK/001', 'tanggal' => '2025-06-01', 'jatuh_tempo' => '2025-07-01', 'status' => 'belum_lunas']);
+        $this->command->info("💸  Created 3 Utang & Piutang records.");
+
+        // 4. Buat Data Gaji
+        Gaji::create(['karyawan_id' => $karyawan1->id, 'periode' => '2025-05-01', 'gaji_pokok' => 15000000, 'tunjangan_jabatan' => 5000000, 'pph21' => 1250000, 'total_pendapatan' => 20000000, 'total_potongan' => 1250000, 'gaji_bersih' => 18750000]);
+        Gaji::create(['karyawan_id' => $karyawan2->id, 'periode' => '2025-05-01', 'gaji_pokok' => 9000000, 'tunjangan_jabatan' => 2000000, 'bonus' => 1000000, 'pph21' => 650000, 'total_pendapatan' => 12000000, 'total_potongan' => 650000, 'gaji_bersih' => 11350000]);
+        $this->command->info("💰  Created 2 Gaji records for May.");
+
+        // 5. Buat Data Pajak
+        Pajak::create(['jenis_pajak' => 'PPN Keluaran', 'no_referensi' => 'FKP-001', 'tanggal_transaksi' => '2025-05-20', 'dasar_pengenaan_pajak' => 25000000, 'tarif_pajak' => 11.00, 'jumlah_pajak' => 2750000, 'status' => 'belum_dibayar']);
+        Pajak::create(['jenis_pajak' => 'PPh 21', 'no_referensi' => 'GAJI/MAY/2025', 'tanggal_transaksi' => '2025-05-25', 'dasar_pengenaan_pajak' => 32000000, 'tarif_pajak' => 5.94, 'jumlah_pajak' => 1900000, 'status' => 'belum_dibayar', 'keterangan' => 'PPh 21 Gabungan Karyawan Mei']);
+        $this->command->info("🧾  Created 2 Pajak records.");
         
-        $printer = Barang::create([
-            'nama' => 'Printer Epson L3210',
-            'kategori' => 'Elektronik',
-            'harga' => 2300000, 
-            'stok' => 5
-        ]);
-        
-        $kertas = Barang::create([
-            'nama' => 'Kertas HVS A4',
-            'kategori' => 'ATK',
-            'harga' => 48000,
-            'stok' => 100
-        ]);
-        
-        echo "📦 Created 3 products\n";
-        
-        // JANUARI - Modal & Untung
-        echo "📅 Creating January data...\n";
-        
-        Transaction::create([
-            'jenis' => 'masuk',
-            'kategori' => 'modal',
-            'keterangan' => 'Modal Awal TPKU',
-            'jumlah' => 100000000,
-            'tanggal' => '2025-01-02'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'pembelian',
-            'keterangan' => 'Pembelian Laptop 10 unit',
-            'jumlah' => 50000000,
-            'qty' => 10,
-            'barang_id' => $laptop->id,
-            'tanggal' => '2025-01-05'
-        ]);
-        
-        // Penjualan Januari
-        for ($i = 10; $i <= 25; $i += 5) {
-            Transaction::create([
-                'jenis' => 'masuk',
-                'kategori' => 'penjualan',
-                'keterangan' => 'Penjualan Laptop',
-                'jumlah' => 7500000,
-                'qty' => 1,
-                'barang_id' => $laptop->id,
-                'tanggal' => "2025-01-{$i}"
-            ]);
-        }
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'operasional',
-            'keterangan' => 'Gaji Karyawan Januari',
-            'jumlah' => 15000000,
-            'tanggal' => '2025-01-25'
-        ]);
-        
-        // FEBRUARI - Rugi
-        echo "📅 Creating February data (LOSS)...\n";
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'pembelian',
-            'keterangan' => 'Pembelian Printer (Harga Naik)',
-            'jumlah' => 8000000,
-            'qty' => 3,
-            'barang_id' => $printer->id,
-            'tanggal' => '2025-02-03'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'masuk',
-            'kategori' => 'penjualan',
-            'keterangan' => 'Flash Sale Printer (Rugi)',
-            'jumlah' => 1800000,
-            'qty' => 1,
-            'barang_id' => $printer->id,
-            'tanggal' => '2025-02-14'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'operasional',
-            'keterangan' => 'Perbaikan AC Rusak',
-            'jumlah' => 5000000,
-            'tanggal' => '2025-02-10'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'operasional',
-            'keterangan' => 'Gaji + THR Februari',
-            'jumlah' => 25000000,
-            'tanggal' => '2025-02-25'
-        ]);
-        
-        // MARET - Recovery
-        echo "📅 Creating March data...\n";
-        
-        for ($day = 5; $day <= 25; $day += 10) {
-            Transaction::create([
-                'jenis' => 'masuk',
-                'kategori' => 'penjualan',
-                'keterangan' => 'Penjualan Laptop',
-                'jumlah' => 7500000,
-                'qty' => 1,
-                'barang_id' => $laptop->id,
-                'tanggal' => "2025-03-{$day}"
-            ]);
-        }
-        
-        // APRIL - Best Month
-        echo "📅 Creating April data (HIGH PROFIT)...\n";
-        
-        for ($i = 1; $i <= 5; $i++) {
-            Transaction::create([
-                'jenis' => 'masuk',
-                'kategori' => 'penjualan',
-                'keterangan' => "Penjualan Laptop #$i",
-                'jumlah' => 7500000,
-                'qty' => 1,
-                'barang_id' => $laptop->id,
-                'tanggal' => "2025-04-" . ($i * 5)
-            ]);
-        }
-        
-        Transaction::create([
-            'jenis' => 'masuk',
-            'kategori' => 'penjualan',
-            'keterangan' => 'Project PT XYZ (5 Laptop)',
-            'jumlah' => 37500000,
-            'tanggal' => '2025-04-15'
-        ]);
-        
-        // MEI
-        echo "📅 Creating May data...\n";
-        
-        Transaction::create([
-            'jenis' => 'masuk',
-            'kategori' => 'penjualan',
-            'keterangan' => 'Penjualan Printer',
-            'jumlah' => 2300000,
-            'qty' => 1,
-            'barang_id' => $printer->id,
-            'tanggal' => '2025-05-10'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'operasional',
-            'keterangan' => 'Gaji Mei',
-            'jumlah' => 15000000,
-            'tanggal' => '2025-05-25'
-        ]);
-        
-        // JUNI - Current
-        echo "📅 Creating June data (current)...\n";
-        
-        Transaction::create([
-            'jenis' => 'masuk',
-            'kategori' => 'penjualan',
-            'keterangan' => 'Penjualan Laptop Awal Juni',
-            'jumlah' => 7500000,
-            'qty' => 1,
-            'barang_id' => $laptop->id,
-            'tanggal' => '2025-06-05'
-        ]);
-        
-        Transaction::create([
-            'jenis' => 'keluar',
-            'kategori' => 'operasional',
-            'keterangan' => 'Listrik Juni',
-            'jumlah' => 1500000,
-            'tanggal' => Carbon::today()
-        ]);
-        
-        $this->printSummary();
-    }
-    
-    private function printSummary()
-    {
-        echo "\n================================================\n";
-        echo "✅ DEMO DATA CREATED SUCCESSFULLY!\n";
-        echo "================================================\n\n";
-        
-        $months = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
-            4 => 'April', 5 => 'Mei', 6 => 'Juni'
-        ];
-        
-        echo "📊 MONTHLY PROFIT/LOSS:\n";
-        foreach ($months as $num => $name) {
-            $income = Transaction::where('jenis', 'masuk')
-                ->whereMonth('tanggal', $num)
-                ->whereYear('tanggal', 2025)
-                ->sum('jumlah');
-                
-            $expense = Transaction::where('jenis', 'keluar')
-                ->whereMonth('tanggal', $num)
-                ->whereYear('tanggal', 2025)
-                ->sum('jumlah');
-                
-            $profit = $income - $expense;
-            $status = $profit >= 0 ? '✅' : '❌';
-            
-            echo sprintf("- %s: %s Rp %s\n", 
-                $name, 
-                $status,
-                number_format(abs($profit), 0, ',', '.')
-            );
-        }
-        
-        echo "\n📦 Products: " . Barang::count() . "\n";
-        echo "💰 Transactions: " . Transaction::count() . "\n\n";
-        echo "🎯 Ready for testing!\n";
+        // 6. Buat Data Transaksi Umum (untuk mengisi laporan laba rugi & kas)
+        Transaction::create(['jenis' => 'masuk', 'kategori' => 'modal', 'keterangan' => 'Modal Awal TPKU', 'jumlah' => 200000000, 'tanggal' => '2025-01-02']);
+        Transaction::create(['jenis' => 'keluar', 'kategori' => 'pembelian', 'keterangan' => 'Pembelian Awal Laptop 20 unit', 'jumlah' => 150000000, 'barang_id' => $laptop->id, 'tanggal' => '2025-01-05']);
+        Transaction::create(['jenis' => 'masuk', 'kategori' => 'penjualan', 'keterangan' => 'Penjualan 2 Laptop ke PT Jaya Abadi', 'jumlah' => 25000000, 'barang_id' => $laptop->id, 'tanggal' => '2025-05-20']);
+        Transaction::create(['jenis' => 'keluar', 'kategori' => 'operasional', 'keterangan' => 'Biaya Listrik & Internet Mei', 'jumlah' => 2500000, 'tanggal' => '2025-05-30']);
+        Transaction::create(['jenis' => 'keluar', 'kategori' => 'operasional', 'keterangan' => 'Pembayaran Gaji Mei', 'jumlah' => 30100000, 'tanggal' => '2025-05-25']); // Total gaji bersih dari data di atas
+        $this->command->info("🔄  Created 5 general transactions.");
+
+
+        $this->command->info("\n================================================");
+        $this->command->info("✅  PROSES SEEDING SELESAI!");
+        $this->command->info("================================================\n");
     }
 }

@@ -9,5 +9,18 @@ class Barang extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'kategori', 'harga', 'stok'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'kode_barang',
+        'nama',
+        'kategori',
+        'unit',
+        'harga',
+        'stok',
+        'status_barang',
+    ];
 }

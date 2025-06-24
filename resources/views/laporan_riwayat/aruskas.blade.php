@@ -402,7 +402,7 @@
                         <p class="text-xl font-bold">
                             @php
                                 $netInvestasi = $investasi->where('jenis', 'masuk')->sum('jumlah') - 
-                                               $investasi->where('jenis', 'keluar')->sum('jumlah');
+                                                $investasi->where('jenis', 'keluar')->sum('jumlah');
                             @endphp
                             {{ $netInvestasi >= 0 ? '+' : '-' }}Rp {{ number_format(abs($netInvestasi), 0, ',', '.') }}
                         </p>
@@ -412,7 +412,7 @@
                         <p class="text-xl font-bold">
                             @php
                                 $netPendanaan = $pendanaan->where('jenis', 'masuk')->sum('jumlah') - 
-                                               $pendanaan->where('jenis', 'keluar')->sum('jumlah');
+                                                $pendanaan->where('jenis', 'keluar')->sum('jumlah');
                             @endphp
                             {{ $netPendanaan >= 0 ? '+' : '-' }}Rp {{ number_format(abs($netPendanaan), 0, ',', '.') }}
                         </p>
@@ -457,7 +457,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/lucide-static@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide-static@latest"></script>
 <script>
     lucide.createIcons();
     
