@@ -33,7 +33,7 @@
                         <span>Tambah Pengadaan</span>
                     </a>
                     <a href="{{ route('pengadaan.index') }}" 
-                       class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                       class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all transform hover:scale-105 backdrop-blur font-semibold flex items-center gap-2">
                         <i data-lucide="package" class="w-5 h-5"></i>
                         <span>Daftar Barang</span>
                     </a>
@@ -146,7 +146,7 @@
                             <th class="py-4 px-4 text-center text-sm font-bold uppercase">Jumlah</th>
                             <th class="py-4 px-4 text-right text-sm font-bold uppercase">Harga Beli</th>
                             <th class="py-4 px-4 text-right text-sm font-bold uppercase">Total</th>
-                            <th class="py-4 px-4 text-center text-sm font-bold uppercase">Aksi</th>
+                            <!-- <th class="py-4 px-4 text-center text-sm font-bold uppercase">Aksi</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -188,7 +188,7 @@
                                         Rp {{ number_format($item->total_harga, 0, ',', '.') }}
                                     </span>
                                 </td>
-                                <td class="py-4 px-4 text-center">
+                                <!-- <td class="py-4 px-4 text-center">
                                     <div class="flex justify-center gap-2">
                                         <a href="{{ route('pengadaan.edit', $item->id) }}" 
                                            class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors" 
@@ -208,7 +208,7 @@
                                             </button>
                                         </form>
                                     </div>
-                                </td>
+                                </td> -->
                             </tr>
                         @empty
                             <tr>

@@ -40,11 +40,11 @@
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Pengadaan Bahan</span>
             </a>
 
-            <a href="{{ route('karyawan.index') }}" 
+            <!-- <a href="{{ route('karyawan.index') }}" 
                class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('karyawan.*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Kelola Karyawan</span>
-            </a>
+            </a> -->
             
             <!-- ============================================= -->
             <!-- === MENU BARU UNTUK ASET TETAP DITAMBAHKAN DI SINI === -->
@@ -74,22 +74,22 @@
                 <i data-lucide="scale" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Laporan Neraca</span>
             </a>
-            <a href="{{ route('laporan.arus_kas') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.arus_kas') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
+            <!-- <a href="{{ route('laporan.arus_kas') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.arus_kas') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="repeat" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Arus Kas</span>
-            </a>
-            <a href="{{ route('laporan.utang_piutang') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.utang_piutang*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
+            </a> -->
+            <!-- <a href="{{ route('laporan.utang_piutang') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.utang_piutang*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="arrow-left-right" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Utang & Piutang</span>
-            </a>
+            </a> -->
             <a href="{{ route('laporan.penggajian') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.penggajian*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="wallet" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Penggajian</span>
             </a>
-            <a href="{{ route('laporan.perpajakan') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.perpajakan*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
+            <!-- <a href="{{ route('laporan.perpajakan') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.perpajakan*') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="landmark" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Perpajakan</span>
-            </a>
+            </a> -->
                  
             <div class="px-2 pt-4 pb-1">
                 <span class="text-xs font-bold text-gray-400 hidden group-hover/sidebar:inline-block">ANALISIS & DETAIL</span>
@@ -102,10 +102,10 @@
                 <i data-lucide="package" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Analisis Produk</span>
             </a>
-            <a href="{{ route('laporan.persediaan') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.persediaan') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
+            <!-- <a href="{{ route('laporan.persediaan') }}" class="flex items-center gap-3 p-2 rounded-md transition {{ request()->routeIs('laporan.persediaan') ? 'bg-[#246342] font-semibold' : 'hover:bg-[#246342]' }}">
                 <i data-lucide="clipboard-list" class="w-5 h-5 shrink-0"></i>
                 <span class="hidden group-hover/sidebar:inline-block whitespace-nowrap">Laporan Persediaan</span>
-            </a>
+            </a> -->
         </nav>
     </div>
 
